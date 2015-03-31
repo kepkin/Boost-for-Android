@@ -6,8 +6,10 @@ compiler:
 before_install:
   - echo $LANG
   - echo $LC_ALL
+  - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
   - sudo apt-get update
-  - sudo apt-get install -yqq libc6-i386 lib32stdc++6 lib32gcc1 lib32ncurses5 lib32z1
+  - sudo apt-get install -yqq libc6-i386 lib32stdc++6 lib32gcc1 lib32ncurses5 lib32z1 g++-4.9
+  - if [ "$CXX" = "g++" ]; then export CXX="g++-4.9" CC="gcc-4.9"; fi
   - wget http://dl.google.com/android/ndk/android-ndk-r10d-linux-x86_64.bin
   - chmod a+x ./android-ndk-r10d-linux-x86_64.bin 
   - ./android-ndk-r10d-linux-x86_64.bin | grep -v "Extract"
