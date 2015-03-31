@@ -4,8 +4,6 @@ compiler:
   - gcc
 
 before_install:
-  - echo $LANG
-  - echo $LC_ALL
   - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
   - sudo apt-get update
   - sudo apt-get install -yqq libc6-i386 lib32stdc++6 lib32gcc1 lib32ncurses5 lib32z1 g++-4.9
@@ -18,7 +16,7 @@ before_install:
 
 script:
   - export TERM=dumb
-  - ./gradlew -PandroidNDK=android-ndk-r10d getBoost buildBoostNative buildBoost zipBuild
+  - ./gradlew -P$(pwd)/androidNDK=android-ndk-r10d getBoost buildBoostNative buildBoost zipBuild
 
 os:
   - linux
