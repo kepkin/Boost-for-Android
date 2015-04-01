@@ -18,7 +18,7 @@ script:
   - export ANDROID_NDK_PATH=$(pwd)/android-ndk-r10d
   - echo $ANDROID_NDK_PATH
   - export TERM=dumb
-  - ./gradlew -PandroidNDK=$ANDROID_NDK_PATH getBoost buildBoostNative buildBoost zipBuild
+  - ./gradlew -PandroidNDK=$ANDROID_NDK_PATH getBoost buildBoostNative buildBoost zipBuild >> build.log || tail -n 1000 build.log
 
 os:
   - linux
