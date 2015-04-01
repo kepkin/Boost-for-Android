@@ -44,7 +44,6 @@ if (androidNDK == "") {
 }
 
 ext {
-    ndkRelease = new File(androidNDK, 'RELEASE.TXT').text
     bjamExtensionToolset = "gcc-androidR8e"
     libsToBuild = libs.tokenize().collect { x -> "--with-$x" }
     ndk_toolchains = ndk_toolchains.tokenize()

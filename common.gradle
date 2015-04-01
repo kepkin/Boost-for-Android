@@ -30,13 +30,8 @@ def TryFindNDK() {
     def homeDir = file(System.getProperty("user.home"))
     def possibleValues = homeDir.listFiles().findAll {it.name.startsWith('android-ndk-')}
 
-    if (possibleValues.size() > 1) {
-        throw GradleException("Found several anroid NDKs. Please specify full" +
-            "path to NDK in gradle.properties file. Found: $possibleValues")
-    }
-    else if (possibleValues.size() == 0) {
-        throw GradleException("Faild to find anroid NDK. Please specify full" +
-            "path to NDK in gradle.properties file.")   
+    if (possibleValues.size() != 1) {
+        return ''
     }
 
     return possibleValues.get(0)

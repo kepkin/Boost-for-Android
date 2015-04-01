@@ -83,6 +83,13 @@ task buildBoostNative(type: CrossPlatformExec, dependsOn: [bootstrapBoost, patch
          ] + libsToBuild
 }
 
+
+gradle.taskGraph.whenReady {taskGraph ->
+    if (taskGraph.hasTask(buildBoost) && androidNDK == "") {
+        throw new GradleException('Failed to find anroid NDK. Please specify full path to NDK in gradle.properties file.')
+    }
+}    
+
 // Following tasks requires to be clean of user-config.jam
 bootstrapBoost.doFirst { delete new File(bjamExtensionDir.getPath(), "user-config.jam") }
 buildBoostNative.doFirst { delete new File(bjamExtensionDir.getPath(), "user-config.jam") }
