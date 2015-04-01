@@ -15,7 +15,7 @@ before_install:
   - ./android-ndk-r10d-linux-x86_64.bin | grep -v "Extract"
 
 script:
-  - export ANDROID_NDK_PATH=$(pwd)/androidNDK=android-ndk-r10d
+  - export ANDROID_NDK_PATH=$(pwd)/android-ndk-r10d
   - echo $ANDROID_NDK_PATH
   - export TERM=dumb
   - ./gradlew -PandroidNDK=$ANDROID_NDK_PATH getBoost buildBoostNative buildBoost zipBuild
