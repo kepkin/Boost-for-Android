@@ -19,22 +19,20 @@ def CreateZipTask(fromDir, publication, incl, excl) {
     zipBuild.dependsOn.add("zip-$publication-Build")
 }
 
-def CreateZipTaskLibs(toolchain, publication) {
-    return CreateZipTask(boostBuildDir, publication, "$toolchain/**", ['**/obj*'])
+BabelBuild.toolchains.each { toolchainObj ->
+    def id = BabelBuild.prebuilt.GetToolchainId(toolchainObj)
+    CreateZipTask(boostBuildDir, id, "$id/**", ['**/obj*'])
 }
 
-ndk_toolchains.each { toolchain ->
-    def toolchainFullName = toolchainPrefixMap[toolchain]
-    CreateZipTaskLibs(toolchainFullName, "$toolchainFullName-$ndk_toolchain_compiler_version")
-}
-
-CreateZipTaskLibs(nativeToochain, nativeToochain)
 CreateZipTask(boostDir, 'include', 'boost/**', [])
 
 // publications can't have dots in names
 publicationsData = publicationsData.collectEntries { publication, archiveName -> [(publication.replace('.', '_')): archiveName] }
 
 publicationsData.each { publication, archiveName ->
+    if(!file(archiveName).exists()) {
+        return
+    }
     publishing.publications.create(publication, MavenPublication) {
         groupId 'org.boost'
         artifactId "Boost-custom-$publication"
