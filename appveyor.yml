@@ -2,6 +2,6 @@ version: 1.53-{build}
 os: Windows Server 2012 R2
 build_script:
 - '"C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat"'
-- gradlew getBoost buildBoostNative zipBuild --stacktrace
+- gradlew getBoost build-native zipBuild --stacktrace
 
 test: off
