@@ -4,8 +4,6 @@ BabelBuild.with {
     PropertyWithDefault("libs", "")
     PropertyWithDefault("ndkApiLevel", "14")
 
-    PropertyWithDefault("bintray_user", "")
-    PropertyWithDefault("bintray_key", "")
     PropertyWithDefault("bintray_dryRun", true)
     PropertyWithDefault("bintray_publish", false)
 }
