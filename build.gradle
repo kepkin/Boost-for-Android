@@ -78,6 +78,10 @@ BabelBuild.toolchains.each { toolchainObj ->
             }
         }
 
+        if(toolchain != 'gcc') {
+            args "cxxflags=-fPIC"
+        }
+
         workingDir boostDir
         executable = BabelBuild.IsWindows() ? "bjam.exe" : "./bjam"
 
