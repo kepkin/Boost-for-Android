@@ -5,7 +5,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'org.bitbucket.aestuarium:babel-build:0.0.2'
+        classpath 'org.bitbucket.aestuarium:babel-build:0.0.4'
     }
 }
 
@@ -21,6 +21,7 @@ import de.undercouch.gradle.tasks.download.Download
 
 apply from: 'properties.gradle'
 apply from: 'publishing.gradle'
+apply from: 'bjam_config.gradle'
 
 task downloadBoost(type: Download) {
     src boostUrl
@@ -48,28 +49,18 @@ BabelBuild.toolchains.each { toolchainObj ->
     def depends = [bootstrapBoost, patchForAndroid]
     def toolchain = toolchainObj.key
 
-    if(toolchainObj.value.os == 'android') {
-        task "copyJamExtension-$toolchain"(type: Copy) {
-            from "configs/" + toolchainBjamExtensionMap[toolchain]
-            into bjamExtensionDir
-            rename { "user-config.jam" }
-        }
-
-        depends.add("copyJamExtension-$toolchain")
-    }
-
     task "$toolchain-Build" (type: CrossPlatformExec, dependsOn: depends) {
         if(toolchainObj.value.os == 'android') {
             String ndkToolsetRoot = BabelBuild.Android.GetNDKToolsetDir(toolchainObj)
-            environment "AndroidToolchainPrefix", BabelBuild.Android.GetNDKToolsetPrefix(toolchainObj)
-            environment "AndroidBinariesPath", ndkToolsetRoot
-            environment "AndroidNDKCompilerVersion", toolchainObj.value.version
             environment "PATH", BabelBuild.AddToSystemPath(ndkToolsetRoot)
-            environment "AndroidNDKRoot", BabelBuild.Android.GetAndroidNDKDir()
-            environment "AndroidNDKApiLevel", ndkApiLevel
             environment "NO_BZIP2", "1"
 
+            doFirst {
+                project.WriteUserConfig(toolchainObj)
+            }
+
             args "target-os=linux"
+            args 'cxxflags=-Wno-unused-local-typedefs'
         } else if(toolchainObj.value.type == 'native') {
             args "toolset=$BabelBuild.NativeToolchain-$BabelBuild.NativeToolchainVersion"
 
@@ -78,7 +69,7 @@ BabelBuild.toolchains.each { toolchainObj ->
             }
         }
 
-        if(toolchain != 'gcc') {
+        if(toolchain == 'gcc') {
             args "cxxflags=-fPIC"
         }
 
@@ -88,7 +79,7 @@ BabelBuild.toolchains.each { toolchainObj ->
         args "link=static"
         args "threading=multi"
         args "--layout=versioned"
-        args "--stagedir=./../BUILD_$underscoreVersion/" + BabelBuild.prebuilt.GetToolchainId(toolchainObj) //TODO: use boostBuildDir
+        args "--stagedir=./../BUILD_$underscoreVersion/" + BabelBuild.prebuilt.GetToolchainId(toolchainObj)
         args "--build-dir=./../BUILD_$underscoreVersion/" + BabelBuild.prebuilt.GetToolchainId(toolchainObj) + "/obj"
         args // TODO: fix that
         args // "-sICONV_PATH=`pwd`/../libiconv-libicu-android/armeabi"

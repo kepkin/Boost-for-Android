@@ -1,0 +1,84 @@
+
+def WriteUserConfig(Object toolchainObj) {
+    BabelBuild.Android.with {
+        def f = new PrintWriter(new File(bjamExtensionDir, 'user-config.jam'))
+
+        def NDKRoot = GetAndroidNDKDir()
+        def toolsetPathPrefix = GetNDKToolsetDir(toolchainObj).getPath() + '/' + GetNDKToolsetPrefix(toolchainObj)
+
+        def arch = ''
+        if (toolchainObj.key.indexOf('arm') != -1) {
+            arch = 'arm'
+        } else if (toolchainObj.key == 'x86') {
+            arch = 'x86'
+        } else if (toolchainObj.key == 'x86_64') {
+            arch = 'x86_64'
+        }
+
+        f.println("import os ;")
+        f.println('')
+        f.println("using gcc : " + toolchainObj.value.version)
+        f.println(':')
+        f.println("${toolsetPathPrefix}-g++")
+        f.println(':')
+        f.println("<archiver>${toolsetPathPrefix}-ar")
+
+        if (arch == 'arm') {
+            if (toolchainObj.key == 'armeabi-v7a') {
+                f.println('<compileflags>-D__ARM_ARCH_7__')
+                f.println('<compileflags>-D__ARM_ARCH_7A__')
+                f.println('<compileflags>-march=armv7-a')
+            }
+
+            f.println('<compileflags>-mtune=xscale')
+            f.println('<compileflags>-msoft-float')
+            f.println('<compileflags>-mthumb')
+
+            f.println('<cxxflags>-D__arm__')
+        }
+
+        f.println("<compileflags>-fexceptions")
+        f.println("<compileflags>-frtti")
+        f.println("<compileflags>-fpic")
+        f.println("<compileflags>-ffunction-sections")
+        f.println("<compileflags>-funwind-tables")
+        f.println("<compileflags>-Wno-psabi")
+        f.println("<compileflags>-Os")
+        f.println("<compileflags>-fomit-frame-pointer")
+        f.println("<compileflags>-fno-strict-aliasing")
+        f.println("<compileflags>-finline-limit=64")
+        f.println("<compileflags>-I${NDKRoot}/sources/android/support/include")
+        f.println("<compileflags>-DTHOUSEP=MON_THOUSANDS_SEP")
+        f.println("<compileflags>-DRADIXCHAR=MON_DECIMAL_POINT")
+        f.println("<compileflags>-I${NDKRoot}/platforms/android-${ndk_platform}/arch-${arch}/usr/include")
+        f.println("<compileflags>-Wa,--noexecstack")
+        f.println("<compileflags>-DANDROID")
+        f.println("<compileflags>-D__ANDROID__")
+        f.println("<compileflags>-DNDEBUG")
+        f.println("<compileflags>-O2")
+        f.println("<compileflags>-g")
+        f.println("<compileflags>-I${NDKRoot}/sources/cxx-stl/gnu-libstdc++/${toolchainObj.value.version}/include")
+        f.println("<compileflags>-I${NDKRoot}/sources/cxx-stl/gnu-libstdc++/${toolchainObj.value.version}/libs/${toolchainObj.key}/include")
+        f.println("# @Moss - Above are the 'oficial' android flags")
+        
+        if (arch == 'arm') {
+            f.println("<architecture>arm")
+        } else if (arch == 'x86') {
+            f.println("<architecture>i686")
+        } else if (arch == 'x86_64') {
+            f.println("<architecture>x86_64")
+        }
+        
+        f.println("<compileflags>-fvisibility=hidden")
+        f.println("<compileflags>-fvisibility-inlines-hidden")
+        f.println("<compileflags>-fdata-sections")
+        f.println("<cxxflags>-D_REENTRANT")
+        f.println("<cxxflags>-D_GLIBCXX__PTHREADS")
+        f.println(";")
+        f.close()
+    }
+}
+
+ext {
+    WriteUserConfig = this.&WriteUserConfig
+}
