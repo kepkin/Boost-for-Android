@@ -20,7 +20,7 @@ def CreateZipTask(fromDir, publication, incl, excl) {
 }
 
 BabelBuild.toolchains.each { toolchainObj ->
-    def id = BabelBuild.prebuilt.GetToolchainId(toolchainObj)
+    def id = BabelBuild.GetToolchainId(toolchainObj)
     CreateZipTask(boostBuildDir, id, "$id/**", ['**/obj*'])
 }
 

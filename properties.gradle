@@ -13,7 +13,7 @@ ext {
     boostName = "boost_" + underscoreVersion
     zipFile = boostName + ".tar.bz2"
     boostUrl = "http://downloads.sourceforge.net/project/boost/boost/$version/$zipFile"
-    unpackedDir = "unpacked"
+    unpackedDir = project.buildDir
     boostBuildDir = new File(unpackedDir, "BUILD_$underscoreVersion/")
     pathToBjamDir = "tools/build/v2"
     boostDir = new File(unpackedDir, boostName)

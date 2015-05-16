@@ -5,7 +5,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'org.bitbucket.aestuarium:babel-build:0.0.4'
+        classpath 'org.bitbucket.aestuarium:babel-build:0.0.9'
     }
 }
 
@@ -48,19 +48,30 @@ BabelBuild.toolchains.each { toolchainObj ->
     def parameters = project.cmake.parameters
     def depends = [bootstrapBoost, patchForAndroid]
     def toolchain = toolchainObj.key
+    def taskName = 'Build-' + BabelBuild.GetToolchainId(toolchainObj)
 
-    task "$toolchain-Build" (type: CrossPlatformExec, dependsOn: depends) {
+    task "$taskName" (type: CrossPlatformExec, dependsOn: depends) {
+        doFirst {
+            project.WriteUserConfig(toolchainObj)
+        }
+
         if(toolchainObj.value.os == 'android') {
             String ndkToolsetRoot = BabelBuild.Android.GetNDKToolsetDir(toolchainObj)
             environment "PATH", BabelBuild.AddToSystemPath(ndkToolsetRoot)
             environment "NO_BZIP2", "1"
 
-            doFirst {
-                project.WriteUserConfig(toolchainObj)
-            }
-
             args "target-os=linux"
             args 'cxxflags=-Wno-unused-local-typedefs'
+        } else if(toolchainObj.value.type == 'ios') {
+            args 'target-os=iphone'
+
+            if (toolchainObj.key == 'x86_64')
+            {
+                args 'macosx-version=iphonesim-8.1'
+            } else {
+                args 'macosx-version=iphone-8.1'
+            }
+
         } else if(toolchainObj.value.type == 'native') {
             args "toolset=$BabelBuild.NativeToolchain-$BabelBuild.NativeToolchainVersion"
 
@@ -79,8 +90,8 @@ BabelBuild.toolchains.each { toolchainObj ->
         args "link=static"
         args "threading=multi"
         args "--layout=versioned"
-        args "--stagedir=./../BUILD_$underscoreVersion/" + BabelBuild.prebuilt.GetToolchainId(toolchainObj)
-        args "--build-dir=./../BUILD_$underscoreVersion/" + BabelBuild.prebuilt.GetToolchainId(toolchainObj) + "/obj"
+        args "--stagedir=./../BUILD_$underscoreVersion/" + BabelBuild.GetToolchainId(toolchainObj)
+        args "--build-dir=./../BUILD_$underscoreVersion/" + BabelBuild.GetToolchainId(toolchainObj) + "/obj"
         args // TODO: fix that
         args // "-sICONV_PATH=`pwd`/../libiconv-libicu-android/armeabi"
         args // "-sICU_PATH=`pwd`/../libiconv-libicu-android/armeabi"
@@ -88,7 +99,7 @@ BabelBuild.toolchains.each { toolchainObj ->
         args libsToBuild
     }
 
-    tasksInToolchainGroups[toolchainObj.value.type].add("$toolchain-Build")
+    tasksInToolchainGroups[toolchainObj.value.type].add(taskName)
 }
 
 tasksInToolchainGroups.each { key, value ->
