@@ -41,7 +41,7 @@ def GetUserConfigIos(Object toolchainObj) {
     config += """\
     ;
     """.stripIndent()
-    
+
     return config
 }
 
@@ -97,18 +97,18 @@ def GetUserConfigAndroid(Object toolchainObj) {
         <compileflags>-fomit-frame-pointer
         <compileflags>-fno-strict-aliasing
         <compileflags>-finline-limit=64
-        <compileflags>-I${NDKRoot}/sources/android/support/include
+        <compileflags>"-isystem ${NDKRoot}/sources/android/support/include"
         <compileflags>-DTHOUSEP=MON_THOUSANDS_SEP
         <compileflags>-DRADIXCHAR=MON_DECIMAL_POINT
-        <compileflags>-I${NDKRoot}/platforms/android-${ndk_platform}/arch-${arch}/usr/include
         <compileflags>-Wa,--noexecstack
         <compileflags>-DANDROID
         <compileflags>-D__ANDROID__
         <compileflags>-DNDEBUG
         <compileflags>-O2
         <compileflags>-g
-        <compileflags>-I${NDKRoot}/sources/cxx-stl/gnu-libstdc++/${toolchainObj.value.version}/include
-        <compileflags>-I${NDKRoot}/sources/cxx-stl/gnu-libstdc++/${toolchainObj.value.version}/libs/${toolchainObj.key}/include
+        <compileflags>"-isystem ${NDKRoot}/platforms/android-${ndk_platform}/arch-${arch}/usr/include"
+        <compileflags>"-isystem ${NDKRoot}/sources/cxx-stl/gnu-libstdc++/${toolchainObj.value.version}/include"
+        <compileflags>"-isystem ${NDKRoot}/sources/cxx-stl/gnu-libstdc++/${toolchainObj.value.version}/libs/${toolchainObj.key}/include"
         # @Moss - Above are the 'oficial' android flags
         """.stripIndent()
 
@@ -119,7 +119,7 @@ def GetUserConfigAndroid(Object toolchainObj) {
         } else if (arch == 'x86_64') {
             config += "<architecture>x86_64\n"
         }
-        
+
         config += """\
         <compileflags>-fvisibility=hidden
         <compileflags>-fvisibility-inlines-hidden
